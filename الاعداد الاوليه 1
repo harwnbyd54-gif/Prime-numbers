@@ -1,0 +1,24 @@
+import mpmath
+
+def explicit_formula_psi(x, num_zeros=20):
+    # الحد الرئيسي الخطي
+    psi_approx = mpmath.mpf(x)
+    
+    # طرح تأثير الأزواج المترافقة للجذور غير التفهية (rho = 1/2 + i*t)
+    for n in range(1, num_zeros + 1):
+        t = mpmath.im(mpmath.zetazero(n))
+        rho = mpmath.mpc(0.5, t)
+        
+        # حساب x^rho / rho مع مراعاة المرافق
+        term = (mpmath.mpf(x)**rho) / rho
+        psi_approx -= 2 * mpmath.re(term)
+        
+    # الحد الثابت الإضافي في التقريب
+    psi_approx -= mpmath.ln(2.0)
+    
+    return float(mpmath.re(psi_approx))
+
+# تجربة حساب التقريب عند قيمة معينة لـ x
+x_val = 20
+result = explicit_formula_psi(x_val, num_zeros=30)
+print(f"Psi({x_val}) approximation = {result}")
