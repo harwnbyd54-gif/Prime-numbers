@@ -1,0 +1,39 @@
+import mpmath
+
+def chebyshev_psi_actual(x):
+    """يحسب القيمة الحقيقية لدالة تشيباشوف psi(x) بناءً على الأعداد الأولية الفعلية."""
+    total = 0
+    # المرور على الأعداد الأولية حتى x
+    for p in mpmath.primes(int(x)):
+        p = int(p)
+        k = 1
+        while p**k <= x:
+            total += mpmath.ln(p)
+            k += 1
+    return float(total)
+
+def explicit_formula_psi(x, num_zeros=30):
+    """يحسب تقريب الصيغة الصريحة لريمان باستخدام الأجزاء التخيلية لأصفار زيتا."""
+    psi_approx = mpmath.mpf(x)
+    
+    for n in range(1, num_zeros + 1):
+        t = mpmath.im(mpmath.zetazero(n))
+        rho = mpmath.mpc(0.5, t)
+        
+        term = (mpmath.mpf(x)**rho) / rho
+        psi_approx -= 2 * mpmath.re(term)
+        
+    psi_approx -= mpmath.ln(2.0)
+    return float(mpmath.re(psi_approx))
+
+# اختبار المقارنة عند قيمة معينة لـ x
+x_val = 100
+num_z = 35
+
+actual_value = chebyshev_psi_actual(x_val)
+approx_value = explicit_formula_psi(x_val, num_zeros=num_z)
+
+print(f"عند القيمة x = {x_val} باستخدام {num_z} جذراً:")
+print(f" - القيمة الحقيقية (من الأعداد الأولية): {actual_value:.4f}")
+print(f" - القيمة عبر الصيغة الصريحة (الترددات): {approx_value:.4f}")
+print(f" - مقدار التباين/الخطأ: {abs(actual_value - approx_value):.4f}")
